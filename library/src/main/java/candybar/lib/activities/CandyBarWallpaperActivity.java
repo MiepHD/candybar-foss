@@ -1,7 +1,6 @@
 package candybar.lib.activities;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -54,7 +53,6 @@ import candybar.lib.adapters.WallpapersAdapter;
 import candybar.lib.applications.CandyBarApplication;
 import candybar.lib.databases.Database;
 import candybar.lib.helpers.LocaleHelper;
-import candybar.lib.helpers.TapIntroHelper;
 import candybar.lib.helpers.ThemeHelper;
 import candybar.lib.items.PopupItem;
 import candybar.lib.items.Wallpaper;
@@ -284,9 +282,6 @@ public class CandyBarWallpaperActivity extends AppCompatActivity implements View
 
     @Override
     protected void onDestroy() {
-        if (Preferences.get(this).isCropWallpaper()) {
-            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
-        }
         Glide.get(this).clearMemory();
         if (mAttacher != null) {
             mAttacher = null;
@@ -330,14 +325,6 @@ public class CandyBarWallpaperActivity extends AppCompatActivity implements View
                             item.setCheckboxValue(Preferences.get(this).isCropWallpaper());
 
                             p.updateItem(position, item);
-                            if (Preferences.get(this).isCropWallpaper()) {
-                                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-                                }
-                                return;
-                            }
-
-                            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
                             return;
                         } else {
                             RectF rectF = null;
@@ -519,12 +506,6 @@ public class CandyBarWallpaperActivity extends AppCompatActivity implements View
                         @Override
                         public void onLoadCleared(@Nullable Drawable placeholder) { /* Do nothing */ }
                     });
-
-            if (Preferences.get(CandyBarWallpaperActivity.this).isCropWallpaper()) {
-                if (android.os.Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
-                }
-            }
         }
 
         AnimationHelper.fade(mProgress).start();
@@ -538,9 +519,5 @@ public class CandyBarWallpaperActivity extends AppCompatActivity implements View
         mRunnable = null;
         mHandler = null;
         mIsResumed = false;
-
-        if (this.getResources().getBoolean(R.bool.show_intro)) {
-            TapIntroHelper.showWallpaperPreviewIntro(this, mWallpaper.getColor());
-        }
     }
 }
