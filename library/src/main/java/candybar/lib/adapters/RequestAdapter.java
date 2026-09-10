@@ -159,28 +159,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             } else {
                 HeaderViewHolder.premWholeContainer.setVisibility(View.GONE);
             }
-
-            if (mShowRegularRequestLimit) {
-                int total = mContext.getResources().getInteger(R.integer.icon_request_limit);
-                int used = Preferences.get(mContext).getRegularRequestUsed();
-                int available = total - used;
-
-                HeaderViewHolder.regTotal.setText(mContext.getResources().getString(
-                        R.string.regular_request_count, total));
-                HeaderViewHolder.regAvailable.setText(mContext.getResources().getString(
-                        R.string.regular_request_available, available));
-                HeaderViewHolder.regUsed.setText(mContext.getResources().getString(
-                        R.string.regular_request_used, used));
-
-                HeaderViewHolder.regProgress.setMax(total);
-                HeaderViewHolder.regProgress.setProgress(available);
-            } else {
-                HeaderViewHolder.regWholeContainer.setVisibility(View.GONE);
-            }
-
-            if (!mContext.getResources().getBoolean(R.bool.enable_icon_request)) {
-                HeaderViewHolder.regWholeContainer.setVisibility(View.GONE);
-            }
         } else if (holder.getItemViewType() == TYPE_CONTENT) {
             int finalPosition = position;
             if (mShowPremiumRequest || mShowRegularRequestLimit) finalPosition -= 1;
@@ -239,7 +217,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                         .typeface(TypefaceHelper.getMedium(mContext), TypefaceHelper.getRegular(mContext))
                         .title(mRequests.get(pos).getName())
                         .content(mRequests.get(pos).getInfoText())
-                        .positiveText(android.R.string.yes)
+                        .positiveText(android.R.string.ok)
                         .show());
             }
 
@@ -277,12 +255,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         private final LinearLayout premWholeContainer;
         private final ProgressBar premProgress;
 
-        private final TextView regTotal;
-        private final TextView regAvailable;
-        private final TextView regUsed;
-        private final LinearLayout regWholeContainer;
-        private final ProgressBar regProgress;
-
         HeaderViewHolder(View itemView) {
             super(itemView);
             TextView premTitle = itemView.findViewById(R.id.premium_request_title);
@@ -295,16 +267,6 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             premAvailable = itemView.findViewById(R.id.premium_request_available);
             premUsed = itemView.findViewById(R.id.premium_request_used);
             premProgress = itemView.findViewById(R.id.premium_request_progress);
-
-
-            TextView regTitle = itemView.findViewById(R.id.regular_request_title);
-            TextView regContent = itemView.findViewById(R.id.regular_request_content);
-            regWholeContainer = itemView.findViewById(R.id.regular_request_container);
-            LinearLayout regContainer = itemView.findViewById(R.id.regular_request);
-            regTotal = itemView.findViewById(R.id.regular_request_total);
-            regAvailable = itemView.findViewById(R.id.regular_request_available);
-            regUsed = itemView.findViewById(R.id.regular_request_used);
-            regProgress = itemView.findViewById(R.id.regular_request_progress);
 
             MaterialCardView card = itemView.findViewById(R.id.card);
             if (CandyBarApplication.getConfiguration().getRequestStyle() == CandyBarApplication.Style.PORTRAIT_FLAT_LANDSCAPE_FLAT &&
@@ -338,26 +300,16 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             premContent.setPadding(padding, 0, 0, 0);
             premContainer.setPadding(padding, 0, padding, 0);
 
-            regContent.setPadding(padding, 0, 0, 0);
-            regContainer.setPadding(padding, 0, padding, 0);
-
             int color = ColorHelper.getAttributeColor(mContext, android.R.attr.textColorPrimary);
             premTitle.setCompoundDrawablesWithIntrinsicBounds(
                     DrawableHelper.getTintedDrawable(mContext,
                             R.drawable.ic_toolbar_premium_request, color),
                     null, null, null);
-
-            regTitle.setCompoundDrawablesWithIntrinsicBounds(
-                    DrawableHelper.getTintedDrawable(mContext,
-                            R.drawable.ic_toolbar_icon_request, color),
-                    null, null, null);
-
             int primary = ColorHelper.getAttributeColor(mContext, androidx.appcompat.R.attr.colorPrimary);
             int accent = ColorHelper.getAttributeColor(mContext, com.google.android.material.R.attr.colorSecondary);
             button.setTextColor(ColorHelper.getTitleTextColor(primary));
 
             premProgress.getProgressDrawable().setColorFilter(accent, PorterDuff.Mode.SRC_IN);
-            regProgress.getProgressDrawable().setColorFilter(accent, PorterDuff.Mode.SRC_IN);
 
             button.setOnClickListener(this);
         }
@@ -538,7 +490,7 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                             .typeface(TypefaceHelper.getMedium(mContext), TypefaceHelper.getRegular(mContext))
                             .title(mContext.getResources().getString(R.string.request_not_available))
                             .content(mRequests.get(position).getInfoText())
-                            .positiveText(android.R.string.yes)
+                            .positiveText(android.R.string.ok)
                             .show();
                 }
             } else {
@@ -620,17 +572,5 @@ public class RequestAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             }
         }
         return items;
-    }
-
-    public boolean isContainsRequested() {
-        List<Request> requests = getSelectedApps();
-        boolean requested = false;
-        for (int i = 0; i < requests.size(); i++) {
-            if (requests.get(i).isRequested()) {
-                requested = true;
-                break;
-            }
-        }
-        return requested;
     }
 }
